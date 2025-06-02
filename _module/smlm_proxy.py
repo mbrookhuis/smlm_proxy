@@ -33,9 +33,9 @@ def _proxy_software_install(internet_access, os_finger):
     cpu_arch = __salt__['grains.get']('cpuarch')
 
     if internet_access:
-        packages = f"podman mgrpxy* mgrctl*"
+        packages = f"podman uyuni-storage-setup-proxy mgrpxy* mgrctl*"
     else:
-        packages = f"podman mgrpxy* mgrctl* suse-manager-5.0-{cpu_arch}-proxy-*"
+        packages = f"podman uyuni-storage-setup-proxy mgrpxy* mgrctl* suse-manager-5.0-{cpu_arch}-proxy-*"
     if "sle micro" in os_finger.lower():
         ret = _execute_command(f"transactional-update -i pkg in {packages}")
         if ret['success']:
@@ -62,7 +62,7 @@ def _get_pillar_data(pillar_key, error=True, default_value=None):
     if data is None or not data:
         if error:
             error = (f"Pillar keys {pillar_key} is empty or not present. Please fix pillar data for "
-                 f"server {__salt__['grains.get']('fqdn')}.")
+                     f"server {__salt__['grains.get']('fqdn')}.")
             return None, error
         else:
             if default_value:
@@ -75,11 +75,12 @@ def _check_if_active():
 
     :return:
     """
-    ret = status()
-    if ret['success']:
-        return {'success': True, 'message': "Proxy already running"}
-    if os.path.isfile("/etc/uyuni/proxy/config.yaml") or os.path.isfile("/etc/uyuni/proxy/httpd.yaml") or os.path.isfile("/etc/uyuni/proxy/ssh.yaml"):
-        return {'success': True, 'message': "Proxy already configured"}
+    if _proxy_software_installed():
+        ret = status()
+        if ret['success']:
+            return {'success': True, 'message': "Proxy already running"}
+        if os.path.isfile("/etc/uyuni/proxy/config.yaml") or os.path.isfile("/etc/uyuni/proxy/httpd.yaml") or os.path.isfile("/etc/uyuni/proxy/ssh.yaml"):
+            return {'success': True, 'message': "Proxy already configured"}
     return {'success': False, 'message': "Proxy not configured"}
 
 def _check_parameters():
@@ -161,7 +162,7 @@ def _get_config():
     file_config="/etc/uyuni/config.tar.gz"
     try:
         # Ensure the directory exists before writing the file
-        #os.makedirs(os.path.dirname(file_config), exist_ok=True)
+        os.makedirs(os.path.dirname(file_config), exist_ok=True)
         with open(file_config, 'wb') as f:
             f.write(config_file.data)
     except Exception as file_write_error:
@@ -248,6 +249,33 @@ def restart():
         ret = {'success': False, 'message': "SMLM Proxy software in not installed"}
         log.error(ret['message'])
         return ret
+
+def clearcaches():
+    """
+    clear the caches of the SMLM proxy.
+
+    example: salt '<fqdn>' smlm_proxy.clearcaches
+
+    :return:
+    """
+    if _proxy_software_installed():
+        cmd = 'mgrpxy stop'
+        result = _execute_command(cmd)
+        if not result['success']:
+            return result
+        cmd = 'rm -rf /var/lib/containers/storage/volumes/uyuni-proxy-squid-cache/_data/*'
+        result = _execute_command(cmd)
+        if not result['success']:
+            return result
+        cmd = 'mgrpxy start'
+        result = _execute_command(cmd)
+        if not result['success']:
+            return result
+    else:
+        ret = {'success': False, 'message': "SMLM Proxy software in not installed"}
+        log.error(ret['message'])
+        return ret
+    return {'success': True, 'message': "cache of proxy cleared"}
 
 def install(internet_access=False, install_when_missing=True, cert_self_signed=False):
     """

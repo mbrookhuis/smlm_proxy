@@ -56,11 +56,12 @@ Currently, these salt modules don't support self-signed certificates. This will 
 ## Execution modules
 
 The following modules are present:
-* smlm_proxy.status     --> this will show the status of the proxy
-* smlm_proxy.start      --> this will start the proxy
-* smlm_proxy.restart    --> this will stop of the proxy
-* smlm_proxy.stop       --> this will restart of the proxy
-* smlm_proxy.install    --> this will install the proxy when not present already.
+* smlm_proxy.status       --> this will show the status of the proxy
+* smlm_proxy.start        --> this will start the proxy
+* smlm_proxy.restart      --> this will stop of the proxy
+* smlm_proxy.stop         --> this will restart of the proxy
+* smlm_proxy.clearcaches  --> this will clear the caches of the proxy
+* smlm_proxy.install      --> this will install the proxy when not present already.
 
 For the option install the following parameters are present: 
 * internet_access: When True, when server has internet access. The image from register.suse.com will be used.
