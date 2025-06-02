@@ -26,7 +26,22 @@ def __virtual__():
     # Example: return False, "The mymodule execution module not found" if not __salt__['mymodule.check_dependency']()
     return __virtualname__
 
+def _proxy_software_installed():
+    """
+    Check if the proxy software is installed.
+    :return:
+    """
+    if os.path.isfile("/usr/bin/mgrpxy"):
+        return True
+    return False
+
 def _execute_command(cmd):
+    """
+    Execute the given command
+
+    :param cmd:
+    :return:
+    """
     ret = {}
     cmd_result = __salt__['cmd.run_all'](cmd, python_shell=True)
     if cmd_result['retcode'] != 0:
@@ -38,9 +53,17 @@ def _execute_command(cmd):
     return ret
 
 def _status_proxy():
-    cmd = 'mgrpxy status'
-    return _execute_command(cmd)
-
+    """
+    Check if the proxy is running.
+    :return:
+    """
+    if _proxy_software_installed():
+        cmd = 'mgrpxy status'
+        return _execute_command(cmd)
+    else:
+        ret = {'success': False, 'message': "SMLM Proxy software in not installed"}
+        log.error(ret['message'])
+        return ret
 
 def started(name, error_when_running=False):
     """
