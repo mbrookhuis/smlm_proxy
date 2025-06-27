@@ -7,7 +7,7 @@ salt module to manage SUSE Multi Linux Manager proxy via salt
 To use the execution and salt modules perform the following actions.
 * copy _module/smlm_proxy.cp to the /srv/salt/_module directory
 ```bash
-mgrctl cp smlm_proxy.py server:/srv/salt/_module
+mgrctl cp smlm_proxy.py server:/srv/salt/_modules
 ```
 * copy _status/smlmproxymod.cp to the /srv/salt/_states directory
 ```bash
