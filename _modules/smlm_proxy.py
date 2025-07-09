@@ -145,7 +145,7 @@ def _get_config():
     email, _ = _get_pillar_data("proxy:email")
     proxy_port, _ = _get_pillar_data("proxy:proxyport", error=False, default_value=8022)
     max_cache, err = _get_pillar_data("proxy:maxcache", error=False, default_value=2048)
-    intermediate_crt, err = _get_pillar_data("proxy:intermediate.crt", error=False, default_value=[])
+    intermediate_crt, err = _get_pillar_data("proxy:intermediate_crt", error=False, default_value=[])
     proxy_name = __salt__['grains.get']('fqdn')
     smlm = __salt__['grains.get']('master')
 

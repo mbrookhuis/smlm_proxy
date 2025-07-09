@@ -15,7 +15,7 @@ mgrctl cp _states/smlmproxymod.py server:/srv/salt/_states
 ```
 * the modules will not be present after copying. Perform a highstate or execute the following command:
 ```bash
-mgrctl exec -ti 'salt "<proxy fqdn>" saltutil.sync_all'
+mgrctl exec -ti "salt 'de*' saltutil.sync_all"
 ```
 
 ### Needed pillar file per proxy
