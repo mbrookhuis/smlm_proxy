@@ -27,20 +27,22 @@ For this create in /srv/pillar a sls file (e.g. with the name proxy_<proxy hostn
 {% import_text "/srv/pillar/certs/<smlm proxy key>" as server_key %}
 {% import_text "/srv/pillar/certs/<rootCA certificate>" as root_crt %}
 {% import_text "/srv/pillar/certs/intermediate_1.crt" as intermediate_crt_1 %}
+{% import_text "/srv/pillar/certs/intermediate_2.crt" as intermediate_crt_2 %}
 
 proxy:
-smlmcred: <credentials of SMLM in the format user:password and then base64 encoded>
-server_crt: {{ server_crt | json }}
-server_key: {{ server_key | json }}
-root_crt: {{ root_crt | json }}
-proxyport: 8022   # this is the default, define another value when needed
-maxcache: 2048   # this is the default, define another value when needed
-email: <mail address, this is needed for the config, but is not used>
-intermediate_crt:    # this is optional. do not define when this is not needed.
-  - {<intermediate_crt_1}
-  - {<intermediate_crt_2}
-  - ... 
-  - {<intermediate_crt_n}
+  smlmcred: <credentials of SMLM in the format user:password and then base64 encoded>
+  server_crt: {{ server_crt | json }}
+  server_key: {{ server_key | json }}
+  root_crt: {{ root_crt | json }}
+  proxyport: 8022   # this is the default, define another value when needed
+  maxcache: 2048   # this is the default, define another value when needed
+  email: <mail address, this is needed for the config, but is not used>
+  extra_disk: <disk just of storage, leave empty when not needed or don't add line>
+  intermediate_crt:    # this is optional. do not define when this is not needed.
+    - {{ intermediate_crt_1 | json }}
+    - {{ intermediate_crt_2 | json }}
+    - ... 
+    - {{ intermediate_crt_n | json }}
 
 ```
 
